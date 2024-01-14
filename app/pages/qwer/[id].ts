@@ -14,11 +14,11 @@ export default ({ van, params, query, context }: Props) => {
   console.log(params, query, context);
 
   return div(
-    "this is qwer",
-    link({ name: "/qwer/:id", params: { id: "kyle" } }, "kyle")
+    "this is qwer/" + params.id,
+    link({ name: "/qwer/asdf" }, "index")
   );
 };
 
 export const metadata = {
-  title: "qwer index",
+  title: "qwer kyle",
 };

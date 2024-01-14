@@ -3,7 +3,7 @@ import { VanObj } from "mini-van-plate/shared";
 import { routes } from "./routes";
 import createCone from "./router";
 
-export function createContext(van: VanObj) {
+export function createContext(van: VanObj, mode: "client" | "ssr") {
   function createRoute(route) {
     return {
       ...route,
@@ -11,24 +11,24 @@ export function createContext(van: VanObj) {
       name: route.path,
       title: async () => {
         if (import.meta.env.DEV) {
-          const m = import.meta.env.MANIFEST["client"];
+          const m = import.meta.env.MANIFEST[mode];
           const a = (await m.inputs[route.$title.src].import())["metadata"][
             "title"
           ];
           return a;
         } else {
           const mod = await route.$component.import();
-          return mod["default"];
+          return mod["metadata"]["title"];
         }
       },
       callable: async () => {
         if (import.meta.env.DEV) {
-          const m = import.meta.env.MANIFEST["client"];
+          const m = import.meta.env.MANIFEST[mode];
           const a = await m.inputs[route.$component.src].import();
           return a;
         } else {
           const mod = await route.$component.import();
-          return mod["default"];
+          return mod;
         }
       },
       // ...route,

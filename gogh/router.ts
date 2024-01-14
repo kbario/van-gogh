@@ -51,8 +51,7 @@ class Router {
 
     // call route handler or throw error
     if (route) {
-      route.handler({ _params, _query, _context });
-      return route;
+      return route.handler({ _params, _query, _context });
     } else {
       throw new Error(`Route not found for ${url}`);
     }
