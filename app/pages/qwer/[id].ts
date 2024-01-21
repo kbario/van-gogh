@@ -14,7 +14,7 @@ export default ({ van, params, query, context }: Props) => {
 
   return div(
     "this is qwer/" + params.id,
-    link({ name: "/qwer/asdf" }, "index")
+    link({ name: "/qwer/asdf" }, " asdf")
   );
 };
 

@@ -1,5 +1,6 @@
 import { VanObj, State } from "mini-van-plate/shared";
 import van from "mini-van-plate/van-plate";
+import layout from "./layout";
 
 interface Props {
   van: VanObj;
@@ -9,14 +10,17 @@ interface Props {
 }
 
 export default ({ van, params, query, context }: Props) => {
-  const { button, main, div } = van.tags;
+  const { button, div } = van.tags;
   const { link } = context;
 
-  return main(
-    { id: "main", class: "bg-zinc-200" },
-    "this is main",
-    button({ onclick: () => alert("Hello from 🍦VanJS") }, "Hello"),
-    link({ name: "/asdf" }, "asdf")
+  return layout(
+    { van },
+    div(
+      { id: "main", class: "bg-zinc-200" },
+      "this is main",
+      button({ onclick: () => alert("Hello from 🍦VanJS") }, " Hello "),
+      link({ name: "/asdf" }, "asdf")
+    )
   );
 };
 

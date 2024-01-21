@@ -13,8 +13,8 @@ export default ({ van, params, query, context }: Props) => {
   const { link } = context;
 
   return div(
-    "this is qwer",
-    link({ name: "/qwer/:id", params: { id: "kyle" } }, "kyle")
+    "this is qwer ",
+    link({ name: "/qwer/:id", params: { id: "gels" } }, "gels")
   );
 };
 

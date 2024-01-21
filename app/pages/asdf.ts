@@ -11,7 +11,7 @@ export default ({ van, params, query, context }: Props) => {
   const { button, main, div } = van.tags;
   const { link } = context;
 
-  return div("this is asdf", link({ name: "/qwer/" }, "qwer"));
+  return div("this is asdf ", link({ name: "/qwer/" }, "qwer"));
 };
 
 export const metadata = {

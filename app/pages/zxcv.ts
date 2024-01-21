@@ -16,7 +16,7 @@ export default ({ van, context }: Props) => {
   return main(
     { id: "main" },
     "this is main",
-    button({ onClick: () => alert("Hello from 🍦VanJS") }, "Hello"),
+    button({ onClick: () => alert("Hello from 🍦VanJS") }, "Hello "),
     link({ name: "/asdf" }, "asdf")
   );
 };
