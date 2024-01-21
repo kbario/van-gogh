@@ -12,9 +12,12 @@ export default ({ van, params, query, context }: Props) => {
   const { button, main, div } = van.tags;
   const { link } = context;
 
-  return div("this is qwer/asdf ", link({ name: "/qwer/gelsa" }, "Gelsa"));
+  return div(
+    "this is qwer/" + params.id,
+    link({ name: "/qwer/asdf" }, " asdf")
+  );
 };
 
 export const metadata = {
-  title: "qwer asdf",
+  title: "qwer kyle",
 };

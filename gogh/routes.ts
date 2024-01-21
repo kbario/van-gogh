@@ -29,9 +29,10 @@ function defineRoutes(fileRoutes: Route[]) {
   return fileRoutes
     .sort((a, b) => a.path.length - b.path.length)
     .reduce((prevRoutes, route) => {
+      if (route.path.includes("layout")) return prevRoutes;
       return processRoute(prevRoutes, route, route.path, route.path);
     }, []);
 }
 
 export const routes = defineRoutes(fileRoutes);
-console.log(routes);
+console.log(routes.map((x) => x.path));

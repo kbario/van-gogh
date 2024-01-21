@@ -4,6 +4,6 @@ import createCone from "../gogh/router";
 import van from "vanjs-core";
 import { createContext } from "../gogh/context";
 
-export const clientContext = createContext(van);
+export const clientContext = createContext(van, "client");
 
 van.add(document.getElementById("main")!, clientContext.routerElement);

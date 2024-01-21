@@ -9,12 +9,12 @@ interface Props {
 }
 
 export default ({ van, params, query, context }: Props) => {
-  const { button, main, div } = van.tags;
+  const { div } = van.tags;
   const { link } = context;
 
-  return div("this is qwer/asdf ", link({ name: "/qwer/gelsa" }, "Gelsa"));
+  return div("this is qwer/koil ", link({ name: "/" }, "index"));
 };
 
 export const metadata = {
-  title: "qwer asdf",
+  title: "qwer koil",
 };

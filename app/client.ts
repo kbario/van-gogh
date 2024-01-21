@@ -1,21 +1,9 @@
-import { VanObj, State } from "mini-van-plate/shared";
-import { clientContext } from "./spa";
-const { link } = clientContext;
+import van from "vanjs-core";
+import app from "./app";
+import "vinxi/client";
 
-interface Props {
-  van: VanObj;
-  id?: string;
-  init?: number;
-  buttonStyle?: string | State<string>;
-}
-
-export default ({ van }: Props) => {
-  const { button, main } = van.tags;
-
-  return main(
-    { id: "main" },
-    "this is main",
-    button({ onClick: () => alert("Hello from 🍦VanJS") }, "Hello"),
-    link({ name: "/asdf" }, "asdf")
-  );
-};
+const a = await app({
+  van,
+  isServer: false,
+});
+van.hydrate(document.getElementById("body")!, () => a);
