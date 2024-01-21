@@ -34,4 +34,3 @@ function defineRoutes(fileRoutes: Route[]) {
 }
 
 export const routes = defineRoutes(fileRoutes);
-console.log(routes);

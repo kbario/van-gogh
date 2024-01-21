@@ -1,10 +1,6 @@
 import { VanObj } from "mini-van-plate/shared";
 const parametersPattern = /(:[^\/]+)/g;
 
-function isServer() {
-  return typeof window === "undefined";
-}
-
 class Router {
   constructor(config) {
     this.routes = [];
@@ -22,7 +18,7 @@ class Router {
     this.routes.push({ name, path, handler, backend, matcher, params });
   }
 
-  dispatch(url, _context) {
+  async dispatch(url, _context) {
     // strip prefix and split path from query string
     const urlSplit = url.replace(new RegExp("^" + this.prefix), "").split("?");
     const queryString = urlSplit[1] || "";
@@ -42,7 +38,6 @@ class Router {
     const route = this.routes.find(
       (r) => (matches = urlSplit[0].match(r.matcher))
     );
-    console;
     // parse route params
     const _params = route?.params.reduce((acc, param, index) => {
       acc[param] = decodeURIComponent(matches[index + 1]);
@@ -51,7 +46,7 @@ class Router {
 
     // call route handler or throw error
     if (route) {
-      return route.handler({ _params, _query, _context });
+      return await route.handler({ _params, _query, _context });
     } else {
       throw new Error(`Route not found for ${url}`);
     }
@@ -94,6 +89,8 @@ function createCone(
   van: VanObj,
   routerElement,
   routes,
+  isServer: boolean,
+  currentRoute?: string,
   defaultNavState?,
   routerConfig?
 ) {
@@ -104,41 +101,6 @@ function createCone(
 
   // router
   const router = new Router(routerConfig);
-
-  routes.forEach(async (route) => {
-    const title = await route.title();
-    router.add(
-      route.name,
-      route.path,
-      route.backend,
-      function ({ _params, _query, _context }) {
-        currentPage.val = route.name;
-        if (route.title && !isServer()) window.document.title = title;
-
-        const params = _params || {};
-        const query = _query || {};
-        const context = _context || {};
-
-        route
-          .callable()
-          .then((page) => {
-            if ("default" in page) {
-              console.log("inside the router 1");
-              return routerElement.replaceChildren(
-                page.default({ van, params, query, context })
-              );
-            } else {
-              console.log("inside the router 2");
-
-              return routerElement.replaceChildren(
-                page(_params, _query, _context)
-              );
-            }
-          })
-          .catch((error) => console.error("error changing page", error));
-      }
-    );
-  });
 
   // nav state
   const _defaultNavState =
@@ -156,7 +118,7 @@ function createCone(
   };
 
   // window navigation events
-  if (!isServer()) {
+  if (!isServer) {
     window.onpopstate = (event) => {
       router.dispatch(event.target.location.href);
     };
@@ -213,7 +175,7 @@ function createCone(
     );
   }
 
-  return {
+  const contextReturn = {
     routerElement,
     currentPage,
     navUrl: router.navUrl,
@@ -226,6 +188,51 @@ function createCone(
     isCurrentPage,
     link,
   };
+
+  routes.forEach(async (route) => {
+    router.add(
+      route.name,
+      route.path,
+      route.backend,
+      async function ({ _params, _query, _context }) {
+        currentPage.val = route.name;
+        if (route.title && !isServer)
+          window.document.title = await route.title(); //.then((x) => x);
+
+        const params = _params || {};
+        const query = _query || {};
+        const context = {
+          ...contextReturn,
+          _context,
+        };
+
+        route
+          .callable()
+          .then((page) => {
+            if ("default" in page) {
+              console.log(routerElement);
+              return routerElement.replaceChildren(
+                page.default({ van, params, query, context })
+              );
+            } else {
+              return routerElement.replaceChildren(
+                page({ van, params, query, context })
+              );
+            }
+          })
+          .catch((error) => console.error("error changing page", error));
+      }
+    );
+  });
+  console.log(
+    routes.map((route) => route.path),
+    currentRoute
+  );
+  if (isServer && routes.some((route) => route.path === currentRoute)) {
+    router.dispatch(currentRoute);
+  }
+
+  return contextReturn;
 }
 
 export default createCone;

@@ -3,7 +3,11 @@ import { VanObj } from "mini-van-plate/shared";
 import { routes } from "./routes";
 import createCone from "./router";
 
-export function createContext(van: VanObj, mode: "client" | "ssr") {
+export function createContext(
+  van: VanObj,
+  isServer: boolean,
+  currentRoute?: string
+) {
   function createRoute(route) {
     return {
       ...route,
@@ -11,24 +15,22 @@ export function createContext(van: VanObj, mode: "client" | "ssr") {
       name: route.path,
       title: async () => {
         if (import.meta.env.DEV) {
-          const m = import.meta.env.MANIFEST[mode];
-          const a = (await m.inputs[route.$title.src].import())["metadata"][
+          const m =
+            import.meta.env?.MANIFEST?.["client"] || window.MANIFEST["client"];
+          return (await m.inputs[route.$title.src].import())["metadata"][
             "title"
           ];
-          return a;
         } else {
-          const mod = await route.$component.import();
-          return mod["metadata"]["title"];
+          return (await route?.["$title"]?.import())["metadata"]?.["title"];
         }
       },
       callable: async () => {
         if (import.meta.env.DEV) {
-          const m = import.meta.env.MANIFEST[mode];
-          const a = await m.inputs[route.$component.src].import();
-          return a;
+          const m =
+            import.meta.env?.MANIFEST?.["client"] || window.MANIFEST["client"];
+          return await m.inputs[route.$component.src].import();
         } else {
-          const mod = await route.$component.import();
-          return mod;
+          return await route.$component?.import();
         }
       },
       // ...route,
@@ -39,8 +41,14 @@ export function createContext(van: VanObj, mode: "client" | "ssr") {
   }
 
   const pageRoutes = routes
-    .map(createRoute)
-    .sort((a, b) => b.name.length - a.name.length);
+    .map((x) => createRoute(x))
+    .sort((a, b) => b.name?.length - a.name?.length);
 
-  return createCone(van, document.getElementById("layout"), pageRoutes);
+  return createCone(
+    van,
+    van.tags.div({ id: "layout" }),
+    pageRoutes,
+    isServer,
+    currentRoute
+  ); // document.getElementById("layout"), pageRoutes);
 }

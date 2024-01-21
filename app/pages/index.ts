@@ -1,6 +1,5 @@
 import { VanObj, State } from "mini-van-plate/shared";
-import { clientContext } from "../spa";
-const { link } = clientContext;
+import van from "mini-van-plate/van-plate";
 
 interface Props {
   van: VanObj;
@@ -11,10 +10,10 @@ interface Props {
 
 export default ({ van, params, query, context }: Props) => {
   const { button, main, div } = van.tags;
-  console.log(params, query, context);
+  const { link } = context;
 
   return main(
-    { id: "main" },
+    { id: "main", class: "bg-zinc-200" },
     "this is main",
     button({ onclick: () => alert("Hello from 🍦VanJS") }, "Hello"),
     link({ name: "/asdf" }, "asdf")

@@ -67,7 +67,7 @@ class VanFileSystemRouter extends BaseFileSystemRouter {
             src: src,
             pick: ["metadata"],
           }
-        : "asdf",
+        : undefined,
       filePath: src,
     };
   }
@@ -87,31 +87,25 @@ function vanFileRouter(config) {
 
 export default createApp({
   routers: [
-    // publicDir(),
-    spaRouter({
-      routes: vanFileRouter({ dir: "./app/pages" }),
-      plugins: function () {
-        return [serverFunctions.client()];
-      },
-    }),
-    // {
-    //   name: "client",
-    //   mode: "build",
-    //   handler: "./app/index.ts",
-    //   routes: vanFileRouter({
-    //     dir: "./app/pages",
-    //   }),
-    //   target: "browser",
-    //   base: "/_build",
-    // },
-    // {
-    //   name: "ssr",
-    //   mode: "handler",
-    //   handler: "./app/server.ts",
-    //   routes: vanFileRouter({
-    //     dir: "./app/pages",
-    //   }),
-    //   target: "server",
-    // },
+    publicDir(),
+    {
+      name: "client",
+      mode: "build",
+      handler: "./app/client.ts",
+      routes: vanFileRouter({
+        dir: "./app/pages",
+      }),
+      target: "browser",
+      base: "/_build",
+    },
+    {
+      name: "ssr",
+      mode: "handler",
+      handler: "./app/server.ts",
+      routes: vanFileRouter({
+        dir: "./app/pages",
+      }),
+      target: "server",
+    },
   ],
 });

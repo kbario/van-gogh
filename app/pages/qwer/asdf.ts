@@ -1,6 +1,5 @@
 import { VanObj, State } from "mini-van-plate/shared";
-import { clientContext } from "../../spa";
-const { link } = clientContext;
+import van from "mini-van-plate/van-plate";
 
 interface Props {
   van: VanObj;
@@ -11,11 +10,11 @@ interface Props {
 
 export default ({ van, params, query, context }: Props) => {
   const { button, main, div } = van.tags;
-  console.log(params, query, context);
+  const { link } = context;
 
   return div("this is qwer/asdf", link({ name: "/" }, "index"));
 };
 
 export const metadata = {
-  title: "qwer",
+  title: "qwer asdf",
 };

@@ -1,7 +1,7 @@
 module.exports = {
-  content: [],
+  content: ["./app/**/*.ts"],
   theme: {
     extend: {},
   },
   plugins: [],
-}
+};
