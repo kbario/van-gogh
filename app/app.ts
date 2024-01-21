@@ -8,10 +8,15 @@ interface Props {
   isServer: boolean;
   currentRoute?: string;
 }
+async function asdf() {}
+const a = await asdf();
 
-export default ({ van, isServer, currentRoute }: Props, children: unknown) => {
+export default async (
+  { van, isServer, currentRoute }: Props,
+  children?: unknown
+) => {
   const { button, main, div } = van.tags;
-  const context = createContext(van, isServer, currentRoute);
+  const context = await createContext(van, isServer, currentRoute);
   const { link } = context;
 
   return main(context.routerElement, children);

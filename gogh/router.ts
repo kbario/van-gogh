@@ -1,3 +1,4 @@
+import { routes } from "./routes";
 import { VanObj } from "mini-van-plate/shared";
 const parametersPattern = /(:[^\/]+)/g;
 
@@ -48,7 +49,7 @@ class Router {
     if (route) {
       return await route.handler({ _params, _query, _context });
     } else {
-      throw new Error(`Route not found for ${url}`);
+      // throw new Error(`Route not found for ${url}`);
     }
   }
 
@@ -85,12 +86,11 @@ class Router {
   }
 }
 
-function createCone(
+async function createCone(
   van: VanObj,
-  routerElement,
   routes,
   isServer: boolean,
-  currentRoute?: string,
+  currentRoute: string,
   defaultNavState?,
   routerConfig?
 ) {
@@ -117,21 +117,8 @@ function createCone(
     }
   };
 
-  // window navigation events
-  if (!isServer) {
-    window.onpopstate = (event) => {
-      router.dispatch(event.target.location.href);
-    };
-
-    window.onload = (event) => {
-      setNavState(window.history.state);
-      router.dispatch(event.target.location.href);
-      if (typeof getNavState() === "undefined") setNavState(null);
-    };
-  }
-
   // navigation functions
-  const navigate = (routeName, options) => {
+  const navigate = async (routeName, options) => {
     const { params, query, navState, context } = options;
     const url = router.navUrl(routeName, params, query);
 
@@ -139,7 +126,9 @@ function createCone(
     history.pushState(getNavState(), "", url);
 
     if (typeof options.dispatch === "undefined" || options.dispatch === true) {
-      router.dispatch(url, context);
+      router
+        .dispatch(url, context)
+        .then((comp) => contextReturn.routerElement.replaceChildren(comp));
     }
 
     return url;
@@ -165,15 +154,47 @@ function createCone(
         target: target || "_self",
         role: "link",
         class: otherProps.class || "router-link",
-        onclick: (event) => {
+        onclick: async (event) => {
           event.preventDefault();
-          navigate(name, { params, query, navState, context });
+          await navigate(name, { params, query, navState, context });
         },
         ...otherProps,
       },
       children
     );
   }
+
+  routes.forEach((route) => {
+    router.add(
+      route.name,
+      route.path,
+      route.backend,
+      async function ({ _params, _query, _context }) {
+        currentPage.val = route.name;
+        if (route.title && !isServer)
+          window.document.title = await route.title(); //.then((x) => x);
+
+        const params = _params || {};
+        const query = _query || {};
+        const context = {
+          link,
+          ..._context,
+        };
+
+        const page = await route.callable();
+        return "default" in page
+          ? page.default({ van, params, query, context })
+          : page({ van, params, query, context });
+      }
+    );
+  });
+
+  const routerElement = isServer
+    ? await (async () => {
+        const comp = await router.dispatch(currentRoute);
+        return van.tags.div({ id: "layout" }, comp);
+      })()
+    : van.tags.div({ id: "layout" });
 
   const contextReturn = {
     routerElement,
@@ -188,48 +209,19 @@ function createCone(
     isCurrentPage,
     link,
   };
+  // window navigation events
+  if (!isServer) {
+    window.onpopstate = (event) =>
+      router
+        .dispatch(event.target.location.href)
+        .then((comp) => contextReturn.routerElement.replaceChildren(comp));
 
-  routes.forEach(async (route) => {
-    router.add(
-      route.name,
-      route.path,
-      route.backend,
-      async function ({ _params, _query, _context }) {
-        currentPage.val = route.name;
-        if (route.title && !isServer)
-          window.document.title = await route.title(); //.then((x) => x);
-
-        const params = _params || {};
-        const query = _query || {};
-        const context = {
-          ...contextReturn,
-          _context,
-        };
-
-        route
-          .callable()
-          .then((page) => {
-            if ("default" in page) {
-              console.log(routerElement);
-              return routerElement.replaceChildren(
-                page.default({ van, params, query, context })
-              );
-            } else {
-              return routerElement.replaceChildren(
-                page({ van, params, query, context })
-              );
-            }
-          })
-          .catch((error) => console.error("error changing page", error));
-      }
-    );
-  });
-  console.log(
-    routes.map((route) => route.path),
-    currentRoute
-  );
-  if (isServer && routes.some((route) => route.path === currentRoute)) {
-    router.dispatch(currentRoute);
+    window.onload = (event) =>
+      router.dispatch(event.target.location.href).then((comp) => {
+        setNavState(window.history.state);
+        contextReturn.routerElement.replaceChildren(comp);
+        if (typeof getNavState() === "undefined") setNavState(null);
+      });
   }
 
   return contextReturn;

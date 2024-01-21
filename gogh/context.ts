@@ -33,10 +33,6 @@ export function createContext(
           return await route.$component?.import();
         }
       },
-      // ...route,
-      // component: async () => await route.$component.import(),
-      // data: route.$$data ? route.$$data.require().routeData : undefined,
-      // children: route.children ? route.children.map(createRoute) : undefined,
     };
   }
 
@@ -44,11 +40,5 @@ export function createContext(
     .map((x) => createRoute(x))
     .sort((a, b) => b.name?.length - a.name?.length);
 
-  return createCone(
-    van,
-    van.tags.div({ id: "layout" }),
-    pageRoutes,
-    isServer,
-    currentRoute
-  ); // document.getElementById("layout"), pageRoutes);
+  return createCone(van, pageRoutes, isServer, currentRoute); // document.getElementById("layout"), pageRoutes);
 }
