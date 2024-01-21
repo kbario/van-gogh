@@ -12,15 +12,15 @@
     "@vinxi/router": "^0.1.4",
     "@vinxi/server-functions": "0.1.0",
     "autoprefixer": "^10.4.17",
-    "mini-van-plate": "^0.5.3",
+    "mini-van-plate": "^0.5.4-perf.0",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
     "van-cone": "^0.0.4",
     "vanjs-core": "^1.2.7",
-    "vinxi": "0.1.1"
+    "vinxi": "^0.1.1"
   },
   "devDependencies": {
-    "daisyui": "^4.5.0",
+    "daisyui": "^4.6.0",
     "es-module-lexer": "^1.4.1",
     "esbuild": "^0.19.11",
     "jsdom": "^23.2.0"

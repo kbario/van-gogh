@@ -10,6 +10,7 @@ function defineRoutes(fileRoutes: Route[]) {
   ) {
     const parentRoute = Object.values(routes).find((o) => {
       return id.startsWith(o.id + "/");
+      // return id.startsWith(o.id); this works with nested routing
     });
 
     if (!parentRoute) {

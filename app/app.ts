@@ -8,8 +8,6 @@ interface Props {
   isServer: boolean;
   currentRoute?: string;
 }
-async function asdf() {}
-const a = await asdf();
 
 export default async (
   { van, isServer, currentRoute }: Props,
